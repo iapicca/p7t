@@ -1,0 +1,7 @@
+name: p7t
+publish_to: none
+environment:
+  sdk: ^3.11.0
+workspace: []
+dev_dependencies:
+  melos: ^7.5.1
