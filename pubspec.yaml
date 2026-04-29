@@ -4,5 +4,16 @@ environment:
   sdk: ^3.11.0
 workspace:
   - packages/p7t_cli
+melos:
+  scripts:
+    codegen:
+      description: Run build_runner in packages that need it.
+      exec: dart run build_runner build --delete-conflicting-outputs
+      packageFilters:
+        dependsOn: build_runner
+    test:
+      description: Run tests in all workspace packages.
+      exec: dart test
+
 dev_dependencies:
   melos: ^7.5.1
