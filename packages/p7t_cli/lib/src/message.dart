@@ -5,11 +5,11 @@ part 'message.freezed.dart';
 part 'message.g.dart';
 
 /// Defines who sent the message.
-enum MessageSender { user, agent }
+enum MessageSender { user, agent, system }
 
 /// Immutable value object representing a single chat message.
 @freezed
-class Message with _$Message {
+abstract class Message with _$Message {
   const factory Message({
     /// The textual content of this message.
     required String content,
@@ -17,7 +17,7 @@ class Message with _$Message {
     /// When this message was created (Unix time UTC).
     required int timestamp,
 
-    /// Whether the message was sent by the user or the agent.
+    /// Whether the message was sent by the user, the agent, or the system.
     required MessageSender sender,
   }) = _Message;
 
