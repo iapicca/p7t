@@ -24,7 +24,7 @@ final class _SetBusyMsg extends Msg {
 final class DartTuiInterface implements TuiInterface {
   DartTuiInterface();
 
-  final _userInputController = StreamController<String>.broadcast();
+  late final StreamController<String> _userInputController;
   late final Program _program;
   late final Future<Model> _programFuture;
 
@@ -33,11 +33,10 @@ final class DartTuiInterface implements TuiInterface {
 
   @override
   Future<void> init() async {
+    _userInputController = StreamController();
     _program = Program(
       options: const ProgramOptions(altScreen: true, hideCursor: true),
-      programOptions: [
-        withTickInterval(const Duration(milliseconds: 100)),
-      ],
+      programOptions: [withTickInterval(const Duration(milliseconds: 100))],
     );
     _programFuture = _program.run(
       _ChatTuiModel(
@@ -88,21 +87,20 @@ final class _ChatTuiModel extends TeaModel {
     SpinnerModel? spinner,
     this.windowWidth = 80,
     this.windowHeight = 24,
-  })  : textInput = textInput ??
-            TextInputModel(
-              placeholder: 'Type a message…',
-              styles: const InputStyles(
-                text: Style(
-                  foregroundRgb: RgbColor(205, 214, 244),
-                ),
-                placeholder: Style(
-                  foregroundRgb: RgbColor(108, 112, 134),
-                  isDim: true,
-                  isItalic: true,
-                ),
-              ),
-            ),
-        spinner = spinner ?? SpinnerModel();
+  }) : textInput =
+           textInput ??
+           TextInputModel(
+             placeholder: 'Type a message…',
+             styles: const InputStyles(
+               text: Style(foregroundRgb: RgbColor(205, 214, 244)),
+               placeholder: Style(
+                 foregroundRgb: RgbColor(108, 112, 134),
+                 isDim: true,
+                 isItalic: true,
+               ),
+             ),
+           ),
+       spinner = spinner ?? SpinnerModel();
 
   final void Function(String) onUserInput;
   final void Function() onQuit;
@@ -120,17 +118,16 @@ final class _ChatTuiModel extends TeaModel {
     SpinnerModel? spinner,
     int? windowWidth,
     int? windowHeight,
-  }) =>
-      _ChatTuiModel(
-        onUserInput: onUserInput,
-        onQuit: onQuit,
-        messages: messages ?? this.messages,
-        busy: busy ?? this.busy,
-        textInput: textInput ?? this.textInput,
-        spinner: spinner ?? this.spinner,
-        windowWidth: windowWidth ?? this.windowWidth,
-        windowHeight: windowHeight ?? this.windowHeight,
-      );
+  }) => _ChatTuiModel(
+    onUserInput: onUserInput,
+    onQuit: onQuit,
+    messages: messages ?? this.messages,
+    busy: busy ?? this.busy,
+    textInput: textInput ?? this.textInput,
+    spinner: spinner ?? this.spinner,
+    windowWidth: windowWidth ?? this.windowWidth,
+    windowHeight: windowHeight ?? this.windowHeight,
+  );
 
   @override
   (Model, Cmd?) update(Msg msg) {
@@ -143,10 +140,7 @@ final class _ChatTuiModel extends TeaModel {
     }
 
     if (msg is WindowSizeMsg) {
-      return (
-        copyWith(windowWidth: msg.width, windowHeight: msg.height),
-        null,
-      );
+      return (copyWith(windowWidth: msg.width, windowHeight: msg.height), null);
     }
 
     if (msg is KeyMsg) {
