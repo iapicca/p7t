@@ -5,14 +5,12 @@ environment:
   sdk: ^3.11.0
 
 dependencies:
-  # Required annotations for Freezed and JSON serialization
   freezed_annotation: ^2.4.1
   json_annotation: ^4.8.1
   value_notifier:
-    path: ../../internal/value_notifier
+    path: ../../internals/value_notifier
 
 dev_dependencies:
-  # Code generators
   build_runner: ^2.4.8
   custom_lint: ^0.7.3
   freezed: ^2.4.7

@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:async' show StreamSubscription;
 import 'package:value_notifier/value_notifier.dart';
 
 import 'agent_interface.dart';
@@ -16,10 +16,6 @@ final class Workflow {
   late final StreamSubscription _inputSubscription;
 
   void _listentInput(String input) {
-    if (input.trim().toLowerCase() == 'exit') {
-      dispose();
-      return;
-    }
     if (input.isEmpty) {
       return;
     }

@@ -1,9 +1,13 @@
+import 'dart:io' show ProcessSignal;
+
 import 'package:p7t_cli/p7t_cli.dart';
 
-/// Entry point for the p7t_cli executable.
-Future<void> main() async {
-  Workflow(
+void main() {
+  final workflow = Workflow(
     agent: const AgentInterfaceMock(),
     terminal: const TerminalInterface.stdio(),
   );
+
+  ProcessSignal.sigint.watch().listen((signal) => workflow.dispose());
+  workflow.init();
 }
