@@ -1,0 +1,8 @@
+name: value_notifier
+description: A pure Dart equivalent to Flutter's ValueNotifier.
+version: 1.0.0
+publish_to: none
+environment:
+  sdk: ^3.11.0
+dev_dependencies:
+  lints: ^3.0.0 
