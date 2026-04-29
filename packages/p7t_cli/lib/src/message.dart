@@ -1,18 +1,27 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+// These part directives are required for freezed and json_serializable code generation.
+part 'message.freezed.dart';
+part 'message.g.dart';
+
+/// Defines who sent the message.
+enum MessageSender { user, agent }
+
 /// Immutable value object representing a single chat message.
-class Message {
-  /// The textual content of this message.
-  final String content;
+@freezed
+class Message with _$Message {
+  const factory Message({
+    /// The textual content of this message.
+    required String content,
 
-  /// When this message was created.
-  final DateTime timestamp;
+    /// When this message was created (Unix time UTC).
+    required int timestamp,
 
-  /// True if sent by the user, false if sent by the bot.
-  final bool isUser;
+    /// Whether the message was sent by the user or the agent.
+    required MessageSender sender,
+  }) = _Message;
 
-  /// Creates a new [Message] with the given properties.
-  const Message({
-    required this.content,
-    required this.timestamp,
-    required this.isUser,
-  });
+  /// Creates a [Message] from a JSON object.
+  factory Message.fromJson(Map<String, dynamic> json) =>
+      _$MessageFromJson(json);
 }
