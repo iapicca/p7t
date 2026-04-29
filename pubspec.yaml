@@ -4,5 +4,11 @@ environment:
   sdk: ^3.11.0
 workspace:
   - packages/p7t_cli
+melos:
+  scripts:
+    test:
+      description: Run tests in all workspace packages.
+      exec: dart test
+
 dev_dependencies:
   melos: ^7.5.1

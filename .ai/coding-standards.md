@@ -1,8 +1,5 @@
 # Coding Standards for p7t
 
-> Derived from comparing `ba09184` (AI-generated baseline) and `b9b5c31` (manual rewrite).
-> This document captures Francesco Iapicca's preferred Dart/Flutter style for future code generation.
-
 ---
 
 ## 1. Naming Conventions
