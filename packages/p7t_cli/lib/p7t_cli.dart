@@ -4,10 +4,12 @@
 /// command-line interface:
 ///
 /// * [Workflow] – orchestrates the chat loop.
-/// * [TerminalInterface] – abstracts terminal I/O.
+/// * [TuiInterface] – abstracts terminal UI interactions.
+/// * [DartTuiInterface] – [TuiInterface] backed by `dart_tui`.
 /// * [AgentInterface] – abstracts the conversational agent.
 library;
 
 export 'src/workflow.dart';
-export 'src/terminal_interface.dart';
+export 'src/tui_interface.dart';
+export 'src/dart_tui_interface.dart';
 export 'src/agent_interface.dart';

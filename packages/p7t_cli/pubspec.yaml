@@ -5,11 +5,10 @@ environment:
   sdk: ^3.11.0
 
 dependencies:
+  characters: ^1.4.0
   dart_tui: ^1.2.0
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
-  value_notifier:
-    path: ../../internals/value_notifier
 
 dev_dependencies:
   build_runner: ^2.14.1

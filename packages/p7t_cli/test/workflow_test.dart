@@ -5,19 +5,35 @@ import 'package:p7t_cli/src/message.dart';
 import 'package:p7t_cli/src/wellknown_messages.dart';
 import 'package:test/test.dart';
 
-/// A fake terminal that feeds input via a synchronous broadcast stream
-/// and records everything written to it.
-class _FakeTerminal implements TerminalInterface {
+/// A fake TUI that feeds input via a synchronous broadcast stream
+/// and records everything displayed to it.
+class _FakeTui implements TuiInterface {
   final _controller = StreamController<String>.broadcast(sync: true);
-  final List<String> outputs = [];
+  final List<Message> displayedMessages = [];
+  final List<bool> busyStates = [];
 
   @override
-  Stream<String> get input => _controller.stream;
+  Stream<String> get userInput => _controller.stream;
 
   @override
-  void write(String text) => outputs.add(text);
+  void displayMessage(Message message) => displayedMessages.add(message);
 
-  void send(String text) => _controller.add(text);
+  @override
+  void setBusy(bool busy) => busyStates.add(busy);
+
+  @override
+  Future<void> init() async {}
+
+  @override
+  Future<void> dispose() async {
+    await _controller.close();
+  }
+
+  void send(String text) {
+    if (!_controller.isClosed) {
+      _controller.add(text);
+    }
+  }
 }
 
 /// A fake agent that exposes pending requests as [Completer]s so tests
@@ -44,14 +60,14 @@ class _FakeAgent implements AgentInterface {
 
 void main() {
   group('Workflow', () {
-    late _FakeTerminal terminal;
+    late _FakeTui tui;
     late _FakeAgent agent;
     late Workflow workflow;
 
     setUp(() async {
-      terminal = _FakeTerminal();
+      tui = _FakeTui();
       agent = _FakeAgent();
-      workflow = Workflow(agent: agent, terminal: terminal);
+      workflow = Workflow(agent: agent, tui: tui);
       await workflow.init();
     });
 
@@ -59,20 +75,20 @@ void main() {
       await workflow.dispose();
     });
 
-    test('init appends greeting and writes it to terminal', () {
-      expect(terminal.outputs, [WellknownMessages.greet]);
+    test('init appends greeting and displays it', () {
+      expect(tui.displayedMessages.length, 1);
+      expect(tui.displayedMessages.first.content, WellknownMessages.greet);
+      expect(tui.displayedMessages.first.sender, MessageSender.system);
     });
 
     test('user input triggers agent ask', () async {
-      terminal.send('hello');
+      tui.send('hello');
       await Future(() {});
       expect(agent.pendingCount, 1);
     });
 
-    test('agent reply is written to terminal', () async {
-      terminal.outputs.clear();
-
-      terminal.send('hello');
+    test('agent reply is displayed', () async {
+      tui.send('hello');
       await Future(() {});
 
       agent.completeNext(
@@ -84,25 +100,27 @@ void main() {
       );
       await Future(() {});
 
-      expect(terminal.outputs, ['hi there']);
+      expect(tui.displayedMessages.length, 3); // greet + user + agent
+      expect(tui.displayedMessages.last.content, 'hi there');
+      expect(tui.displayedMessages.last.sender, MessageSender.agent);
     });
 
     test('empty input is ignored', () async {
-      terminal.send('   ');
+      tui.send('   ');
       await Future(() {});
       expect(agent.pendingCount, 0);
     });
 
     test('does not crash when input arrives while busy', () async {
-      terminal.send('msg1');
+      tui.send('msg1');
       await Future(() {});
-      terminal.send('msg2');
+      tui.send('msg2');
       await Future(() {});
       expect(agent.pendingCount, 1);
     });
 
     test('reply clears busy flag', () async {
-      terminal.send('hello');
+      tui.send('hello');
       await Future(() {});
 
       agent.completeNext(
@@ -114,20 +132,36 @@ void main() {
       );
       await Future(() {});
 
-      terminal.send('hello2');
+      tui.send('hello2');
       await Future(() {});
       expect(agent.pendingCount, 1);
     });
 
-    test('dispose appends exit message and writes it to terminal',
-        () async {
+    test('busy states are set correctly', () async {
+      tui.send('hello');
+      await Future(() {});
+      expect(tui.busyStates, [true]);
+
+      agent.completeNext(
+        const Message(
+          content: 'reply',
+          timestamp: 1,
+          sender: MessageSender.agent,
+        ),
+      );
+      await Future(() {});
+      expect(tui.busyStates, [true, false]);
+    });
+
+    test('dispose appends exit message and displays it', () async {
       await workflow.dispose();
-      expect(terminal.outputs, contains(WellknownMessages.exit));
+      final contents = tui.displayedMessages.map((m) => m.content).toList();
+      expect(contents, contains(WellknownMessages.exit));
     });
 
     test('dispose cancels input subscription', () async {
       await workflow.dispose();
-      terminal.send('after dispose');
+      tui.send('after dispose');
       await Future(() {});
       expect(agent.pendingCount, 0);
     });
