@@ -1,4 +1,4 @@
-import 'package:p7t_cli/src/message.dart';
+import 'package:p7t_cli/src/domain/message.dart';
 import 'package:test/test.dart';
 
 void main() {

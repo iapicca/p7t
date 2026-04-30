@@ -10,6 +10,6 @@
 library;
 
 export 'src/workflow.dart';
-export 'src/tui_interface.dart';
+export 'src/domain/terminal_interface.dart';
 export 'src/dart_tui_interface.dart';
-export 'src/agent_interface.dart';
+export 'src/domain/agent_interface.dart';

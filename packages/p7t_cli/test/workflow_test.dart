@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:p7t_cli/p7t_cli.dart';
-import 'package:p7t_cli/src/message.dart';
+import 'package:p7t_cli/src/domain/message.dart';
 import 'package:p7t_cli/src/wellknown_messages.dart';
 import 'package:test/test.dart';
 

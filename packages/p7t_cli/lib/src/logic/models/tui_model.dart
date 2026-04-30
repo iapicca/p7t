@@ -1,76 +1,7 @@
-import 'dart:async';
+import 'package:dart_tui/dart_tui.dart' as ui;
 
-import 'package:characters/characters.dart';
-import 'package:dart_tui/dart_tui.dart';
-
-// ── Custom messages used by ChatTuiModel ────────────────────────────────────
-
-final class _DisplayMessageMsg extends Msg {
-  _DisplayMessageMsg(this.message);
-  final Message message;
-}
-
-final class _SetBusyMsg extends Msg {
-  _SetBusyMsg(this.busy);
-  final bool busy;
-}
-
-// ── DartTuiInterface ────────────────────────────────────────────────────────
-
-/// A [TuiInterface] implementation backed by [dart_tui]'s [Program].
-final class DartTuiInterface implements TuiInterface {
-  DartTuiInterface();
-
-  late final StreamController<String> _userInputController;
-  late final Program _program;
-  late final Future<Model> _programFuture;
-
-  @override
-  Stream<String> get userInput => _userInputController.stream;
-
-  @override
-  Future<void> init() async {
-    _userInputController = StreamController();
-    _program = Program(
-      options: const ProgramOptions(altScreen: true, hideCursor: true),
-      programOptions: [withTickInterval(const Duration(milliseconds: 100))],
-    );
-    _programFuture = _program.run(
-      _ChatTuiModel(
-        onUserInput: (text) {
-          if (!_userInputController.isClosed) {
-            _userInputController.add(text);
-          }
-        },
-        onQuit: () {
-          if (!_userInputController.isClosed) {
-            _userInputController.close();
-          }
-        },
-      ),
-    );
-  }
-
-  @override
-  void displayMessage(Message message) {
-    _program.send(_DisplayMessageMsg(message));
-  }
-
-  @override
-  void setBusy(bool busy) {
-    _program.send(_SetBusyMsg(busy));
-  }
-
-  @override
-  Future<void> dispose() async {
-    _program.quit();
-  }
-}
-
-// ── ChatTuiModel ────────────────────────────────────────────────────────────
-
-final class _ChatTuiModel extends TeaModel {
-  _ChatTuiModel({
+final class TuiModel extends ui.Model {
+  TuiModel({
     required this.onUserInput,
     required this.onQuit,
     this.messages = const [],
